@@ -17,6 +17,7 @@ class YOLOTrackingPublisher(Node):
         self.pkg_dir = os.path.join(get_package_share_directory('a4_week4'))
         weight_dir = os.path.join(self.pkg_dir, 'weights', self.weigts)
         self.model = YOLO(weight_dir)
+        self.class_name = self.model.names
 
         self.cap = cv2.VideoCapture(2)
         self.timer = self.create_timer(0.1, self.timer_callback)  # Adjust timer frequency as needed
@@ -33,16 +34,17 @@ class YOLOTrackingPublisher(Node):
         for result in results:
             for detection in result.boxes.data:
                 if len(detection) >= 6:
-                    x1, y1, x2, y2, confidence, class_id = detection[:6]
-                    track_id = detection[6] if len(detection) > 6 else None
+                    #x1, y1, x2, y2, confidence, class_id = detection[:6]
+                    x1, y1, x2, y2, track_id, confidence = detection[:6]
+                    class_id = detection[6] if len(detection) > 6 else None
                     center_x = int((x1 + x2) / 2)
                     center_y = int((y1 + y2) / 2)
                     # Draw bounding box and center point on the frame
                     cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
                     cv2.circle(frame, (center_x, center_y), 5, (0, 0, 255), -1)
-                    label_text = f'Conf: {confidence:.2f} Class: {int(class_id)}'
+                    label_text = f'Conf: {confidence:.2f} track_id: {int(track_id)}'
                     if track_id is not None:
-                        label_text = f'Track_ID: {int(track_id)}, ' + label_text
+                        label_text = f'Class: {self.class_name[int(class_id)]}, ' + label_text
                     cv2.putText(frame, label_text, (int(x1), int(y1) - 10),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
         # Convert the frame to a ROS 2 Image message and publish
