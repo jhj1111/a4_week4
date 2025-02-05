@@ -13,6 +13,7 @@ setup(
         ('share/' + package_name, ['package.xml']),
         (os.path.join('share', package_name, 'weights'), glob.glob('weights/*')),
         (os.path.join('share', package_name, 'trackers'), glob.glob('trackers/*')),
+        (os.path.join('share', package_name, 'waypoints'), glob.glob('waypoints/*')),
         (os.path.join('share', package_name, 'launch'), glob.glob('launch/*.launch.py')),
     ],
     install_requires=['setuptools'],
@@ -32,6 +33,8 @@ setup(
             'init_pose = a4_week4.init_pose:main',
             'send_goal_stop = a4_week4.send_goal_stop:main',
             'send_waypoint = a4_week4.send_waypoint:main',
+            'set_nav_mode = a4_week4.set_nav_mode:main',
+            'status_publisher = a4_week4.status_publisher:main',
         ],
     },
 )
