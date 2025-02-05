@@ -1,6 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
+from a4_week4_interface.msg import BoxPoint
 from cv_bridge import CvBridge
 from ultralytics import YOLO
 import cv2, os
@@ -13,6 +14,7 @@ class YOLOTrackingPublisher(Node):
         self.weigts = 'sample02_best.pt'
 
         self.publisher_ = self.create_publisher(Image, 'tracked_image', 10)
+        self.box_size_pub = self.create_publisher()
         self.bridge = CvBridge()
         self.pkg_dir = os.path.join(get_package_share_directory('a4_week4'))
         weight_dir = os.path.join(self.pkg_dir, 'weights', self.weigts)
