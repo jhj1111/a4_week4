@@ -8,9 +8,18 @@ import termios
 import tty
 
 class InitialPosePublisher(Node):
-    def __init__(self):
+    def __init__(self, auto_init):
         super().__init__('initial_pose_publisher')
         self.publisher = self.create_publisher(PoseWithCovarianceStamped, '/initialpose', 10)
+        self.get_logger().info(f'auto_init = {auto_init}')
+        if auto_init is None :
+            # 파라미터 선언 (기본값 False)
+            self.declare_parameter('auto_init', False)
+            auto_init = self.get_parameter('auto_init').get_parameter_value().bool_value
+
+        if auto_init:
+            self.get_logger().info("Auto initializing pose...")
+            self.publish_initial_pose()
 
     def publish_initial_pose(self):
         # Create the initial pose message
@@ -119,7 +128,11 @@ def keyboard_listener(node):
 
 def main(args=None):
     rclpy.init(args=args)
-    node = InitialPosePublisher()
+    if len(sys.argv) < 2: auto_init = None
+    else : auto_init = sys.argv[1]
+    print(auto_init)
+
+    node = InitialPosePublisher(auto_init)
 
     # Start the keyboard listener in a separate thread
     thread = threading.Thread(target=keyboard_listener, args=(node,), daemon=True)
